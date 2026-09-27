@@ -46,6 +46,20 @@ All commands also appear in the context menu of files and folders in the Explore
 ## Details worth knowing
 
 - The reference pane is a **virtual read-only document** — you cannot accidentally edit the original.
+- **Too much red/green?** The full-line fill is drawn by your VS Code theme, not by the extension. To keep only a thin strip in the gutter and a faint tint on changed characters, add this to your user `settings.json` (*Preferences: Open User Settings (JSON)*):
+  ```jsonc
+  "workbench.colorCustomizations": {
+    // full-line fills off
+    "diffEditor.insertedLineBackground": "#00000000",
+    "diffEditor.removedLineBackground": "#00000000",
+    // faint tint inside changed characters
+    "diffEditor.insertedTextBackground": "#2EA04320",
+    "diffEditor.removedTextBackground": "#F8514920",
+    // thin strips in the gutter
+    "diffEditorGutter.insertedLineBackground": "#2EA043",
+    "diffEditorGutter.removedLineBackground": "#F85149"
+  }
+  ```
 - **The striped zone under your text** in the diff view is VS Code's filler for "beyond the end of the file" on the shorter side — clicking there clamps the cursor to the end of the document (that is why Enter seemed to "jump to the bottom"). Extensions cannot restyle it, so VS No Vibe removes the problem instead: with `vsnovibe.skeletonLines` on, both panes have the same number of lines and the filler is gone.
 - "Done" is automatic when your file matches the reference line-for-line (lines are compared trimmed and dash/quote-normalized; blank lines don't count against you), or manual via *Mark as Done* when you deliberately restructured the code.
 - Progress = longest common subsequence of non-blank lines, reference vs your file. Files over 5000 lines show `–`.
