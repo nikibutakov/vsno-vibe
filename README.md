@@ -1,3 +1,5 @@
+**English** | [Русский](README.ru.md)
+
 # VS No Vibe
 
 **No vibe, just hands.** Retype AI-generated code by hand, file by file, with a read-only reference open side by side.
@@ -11,9 +13,9 @@ VS No Vibe automates the boring parts of that workflow for VS Code.
 ## How it works
 
 1. Your agent generated a bunch of files (say, in `src/`). Right-click that folder in the Explorer → **VS No Vibe: Start Rewriting Folder…**
-2. The extension scans it (skipping `node_modules`, binaries, lockfiles, dotfiles, huge files) and creates a mirror folder next to it — `src.handwritten/` — filled with **empty** copies of every file.
-3. It opens a diff view: **your empty file on the left, the AI reference on the right (read-only)**.
-4. You type. The status bar shows `✍ 42% · 3/12` — percent of reference lines retyped and files done. Paste is blocked.
+2. The extension scans it (skipping `node_modules`, binaries, lockfiles, dotfiles, huge files) and creates a mirror folder next to it — `src.handwritten/` — filled with **blank-line skeletons** of every file.
+3. It opens a diff view: **your file on the left, the AI reference on the right (read-only)**.
+4. You type. The status bar shows `✍ 42% · 3/12` — percent of reference lines retyped and files done. Real pasting is blocked; autocomplete works.
 5. When your copy matches the reference, the file is marked done and you jump to the next one with `Ctrl+Alt+N`.
 
 Nothing touches your original files — they only serve as the reference. Your rewritten files are normal files on disk.
@@ -22,13 +24,14 @@ Nothing touches your original files — they only serve as the reference. Your r
 
 | Command | Keybinding | Description |
 | --- | --- | --- |
-| `VS No Vibe: Start Rewriting Folder…` | — | Pick a folder, create the empty mirror, open the first file |
+| `VS No Vibe: Start Rewriting Folder…` | — | Pick a folder, create the mirror skeletons, open the first file |
 | `VS No Vibe: Start Rewriting File…` | — | Same, for a single file |
 | `VS No Vibe: Next File` | `Ctrl+Alt+N` | Jump to the next file that is not done yet |
 | `VS No Vibe: Previous File` | `Ctrl+Alt+P` | Browse one file back |
 | `VS No Vibe: Choose File…` | `Ctrl+Alt+O` | Quick pick with the whole queue (✓ done, ● current) |
 | `VS No Vibe: Mark Current File as Done` | — | When you finished a file your own way |
 | `VS No Vibe: End Session` | — | Drop the session (rewritten files stay on disk) |
+| `VS No Vibe: Apply Calm Diff Colors` | — | Apply the calm diff palette (thin gutter strips) to your user settings |
 
 All commands also appear in the context menu of files and folders in the Explorer.
 
@@ -40,8 +43,8 @@ All commands also appear in the context menu of files and folders in the Explore
 | `vsnovibe.exclude` | `node_modules`, `.git`, `dist`, … | File/folder names to skip while scanning. Dotfiles, binaries, lockfiles and minified files are always skipped. |
 | `vsnovibe.typeableReference` | `true` | Show the reference with untypeable typography replaced: em dashes `—` → `-`, curly quotes → `'`/`"`, non-breaking spaces → spaces. What you see is what you can type, and the diff goes green when you finish a line. |
 | `vsnovibe.skeletonLines` | `true` | Start your copy with as many blank lines as the reference has, instead of an empty file. Both diff panes stay the same length, so there is no striped filler under your text and the cursor never jumps on Enter. |
-| `vsnovibe.calmDiffColors` | `ask` | Offer calm diff colors on the first session: `ask`, `apply`, or `off`. |
 | `vsnovibe.maxExtraLines` | `5` | How many lines longer than the reference your copy may get. Extra blank lines beyond this budget are removed automatically ~0.4 s after you stop typing (content lines are never touched). |
+| `vsnovibe.calmDiffColors` | `ask` | Offer calm diff colors on the first session: `ask`, `apply`, or `off`. |
 | `vsnovibe.pasteBlock.enabled` | `true` | Block pasting into files being rewritten: inserts matching the clipboard are reverted. Autocomplete and snippets stay allowed. |
 | `vsnovibe.pasteBlock.minChars` | `8` | Minimum length of a single insert that is checked against the clipboard. |
 
@@ -77,25 +80,14 @@ git clone <this-repo>
 cd vsno-vibe
 npm install
 npm run package          # → dist/extension.js
-npx @vscode/vsce package # → vsno-vibe-0.1.0.vsix
-code --install-extension vsno-vibe-0.1.0.vsix
+npx @vscode/vsce package # → vsno-vibe-x.y.z.vsix
+code --install-extension vsno-vibe-x.y.z.vsix
 ```
 
 For development: open the folder in VS Code and press `F5` (Extension Development Host).
 End-to-end smoke test: `npm run smoke` — runs the extension in a clean VS Code against a fixture folder (downloads a fresh build into `.vscode-test/` on first run).
 
 Works in VS Code, Cursor, VSCodium and other VS Code-compatible editors.
-
-## На русском
-
-**No vibe, just hands.** Переписывай сгенерированный нейросетью код руками, файл за файлом: слева — твой пустой файл, справа — эталон от ИИ (только для чтения).
-
-1. Агент нагенерировал файлов в папке → ПКМ по папке в Explorer → **VS No Vibe: Start Rewriting Folder…**
-2. Расширение создаст рядом зеркало `имя-папки.handwritten/` с **пустыми** копиями всех текстовых файлов и откроет diff первого.
-3. Печатаешь слева руками. Вставка (Ctrl+V) блокируется. Статус-бар показывает прогресс: `✍ 42% · 3/12` — процент переписанных строк эталона и число готовых файлов.
-4. Файл совпал с эталоном — отмечается ✓ и переносит к следующему (`Ctrl+Alt+N`). Оригиналы ИИ-файлов не изменяются, твои копии — обычные файлы на диске.
-
-Все команды доступны в контекстном меню файлов и папок. Настройки — по префиксу `vsnovibe.`: имя зеркальной папки, исключения при сканировании, «печатаемый» эталон (длинные тире `—` заменяются на обычный минус `-`, фигурные кавычки — на прямые: всё, что видишь в эталоне, можно набрать с клавиатуры), «скелет» — твоя копия создаётся не пустой, а с тем же числом пустых строк, что и эталон: панели diff одной длины, курсор на Enter не убегает вниз, «спокойные цвета» diff (предлагаются при первой сессии или командой Apply Calm Diff Colors) и умная блокировка вставки: настоящий Ctrl+V откатывается, автодополнение через Tab работает, а рефлексные лишние Enter'ы убираются сами: копия может вырасти максимум на `vsnovibe.maxExtraLines` (по умолчанию 5) пустых строк сверх эталона — это всё же реврайт, а не дописывание.
 
 ## Roadmap
 
