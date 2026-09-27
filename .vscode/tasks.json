@@ -2,13 +2,12 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "watch",
+      "label": "compile",
       "type": "npm",
-      "script": "watch",
-      "problemMatcher": "$esbuild",
-      "isBackground": true,
+      "script": "compile",
+      "problemMatcher": ["$tsc"],
       "presentation": {
-        "reveal": "never",
+        "reveal": "silent",
         "panel": "dedicated"
       },
       "group": {
@@ -17,11 +16,15 @@
       }
     },
     {
-      "label": "compile",
+      "label": "watch",
       "type": "npm",
-      "script": "compile",
-      "problemMatcher": ["$tsc", "$esbuild"],
-      "group": "build"
+      "script": "watch",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never",
+        "panel": "dedicated"
+      },
+      "isBackground": true
     }
   ]
 }
