@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { normalizeForTyping } from './progress';
 
 export const REF_SCHEME = 'vsnovibe-ref';
 
@@ -23,7 +24,11 @@ export class ReferenceProvider implements vscode.TextDocumentContentProvider {
       return '';
     }
     try {
-      return fs.readFileSync(filePath, 'utf8');
+      const content = fs.readFileSync(filePath, 'utf8');
+      const typeable = vscode.workspace
+        .getConfiguration('vsnovibe')
+        .get<boolean>('typeableReference', true);
+      return typeable ? normalizeForTyping(content) : content;
     } catch {
       return `// [VS No Vibe] reference file is gone: ${filePath}`;
     }

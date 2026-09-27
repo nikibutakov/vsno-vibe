@@ -2,7 +2,7 @@
   "name": "vsno-vibe",
   "displayName": "VS No Vibe",
   "description": "No vibe, just hands. Retype AI-generated code by hand, file by file, with a read-only reference open side by side.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "vsno-vibe",
   "license": "MIT",
   "keywords": [
@@ -160,6 +160,16 @@
             "coverage"
           ],
           "description": "File or folder names to skip when scanning the source folder (matched case-insensitively against any path segment). Dotfiles, binaries, lockfiles and minified files are always skipped."
+        },
+        "vsnovibe.typeableReference": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the reference with characters you cannot type on a keyboard (em dashes, curly quotes, non-breaking spaces) replaced by plain equivalents, so what you see is what you can type."
+        },
+        "vsnovibe.skeletonLines": {
+          "type": "boolean",
+          "default": true,
+          "description": "Prefill your copy with as many blank lines as the reference has, instead of an empty file. Keeps both diff panes the same length: no striped filler under your text and a predictable cursor. Files that already have content are never touched."
         },
         "vsnovibe.pasteBlock.enabled": {
           "type": "boolean",

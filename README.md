@@ -38,16 +38,19 @@ All commands also appear in the context menu of files and folders in the Explore
 | --- | --- | --- |
 | `vsnovibe.targetFolderSuffix` | `.handwritten` | Suffix for the mirror folder. When the source folder is a workspace root, a `handwritten/` folder is created inside it instead. |
 | `vsnovibe.exclude` | `node_modules`, `.git`, `dist`, … | File/folder names to skip while scanning. Dotfiles, binaries, lockfiles and minified files are always skipped. |
+| `vsnovibe.typeableReference` | `true` | Show the reference with untypeable typography replaced: em dashes `—` → `-`, curly quotes → `'`/`"`, non-breaking spaces → spaces. What you see is what you can type, and the diff goes green when you finish a line. |
+| `vsnovibe.skeletonLines` | `true` | Start your copy with as many blank lines as the reference has, instead of an empty file. Both diff panes stay the same length, so there is no striped filler under your text and the cursor never jumps on Enter. |
 | `vsnovibe.pasteBlock.enabled` | `true` | Block pasting into files being rewritten (the inserted text is reverted). |
 | `vsnovibe.pasteBlock.minChars` | `8` | Minimum length of a single insert that counts as a paste. Note: this also blocks long autocomplete/snippet inserts — that is the spirit of the tool. |
 
 ## Details worth knowing
 
 - The reference pane is a **virtual read-only document** — you cannot accidentally edit the original.
-- "Done" is automatic when your file matches the reference line-for-line (lines are compared trimmed, so indentation slips don't hurt), or manual via *Mark as Done* when you deliberately restructured the code.
-- Progress = longest common subsequence of lines, reference vs your file. Files over 5000 lines show `–`.
+- **The striped zone under your text** in the diff view is VS Code's filler for "beyond the end of the file" on the shorter side — clicking there clamps the cursor to the end of the document (that is why Enter seemed to "jump to the bottom"). Extensions cannot restyle it, so VS No Vibe removes the problem instead: with `vsnovibe.skeletonLines` on, both panes have the same number of lines and the filler is gone.
+- "Done" is automatic when your file matches the reference line-for-line (lines are compared trimmed and dash/quote-normalized; blank lines don't count against you), or manual via *Mark as Done* when you deliberately restructured the code.
+- Progress = longest common subsequence of non-blank lines, reference vs your file. Files over 5000 lines show `–`.
 - The session survives window reloads; use *Choose File…* to reopen a diff.
-- Existing files in the mirror folder are never overwritten — your work is safe.
+- Existing mirror files with content are never overwritten; brand-empty copies get the skeleton filled in when you (re)start a session.
 
 ## Install (from source)
 
@@ -76,7 +79,7 @@ Works in VS Code, Cursor, VSCodium and other VS Code-compatible editors.
 3. Печатаешь слева руками. Вставка (Ctrl+V) блокируется. Статус-бар показывает прогресс: `✍ 42% · 3/12` — процент переписанных строк эталона и число готовых файлов.
 4. Файл совпал с эталоном — отмечается ✓ и переносит к следующему (`Ctrl+Alt+N`). Оригиналы ИИ-файлов не изменяются, твои копии — обычные файлы на диске.
 
-Все команды доступны в контекстном меню файлов и папок. Настройки — по префиксу `vsnovibe.` (имя зеркальной папки, исключения при сканировании, блокировка вставки).
+Все команды доступны в контекстном меню файлов и папок. Настройки — по префиксу `vsnovibe.`: имя зеркальной папки, исключения при сканировании, блокировка вставки, «печатаемый» эталон (длинные тире `—` заменяются на обычный минус `-`, фигурные кавычки — на прямые: всё, что видишь в эталоне, можно набрать с клавиатуры) и «скелет» — твоя копия создаётся не пустой, а с тем же числом пустых строк, что и эталон: панели diff одной длины, курсор на Enter не убегает вниз.
 
 ## Roadmap
 

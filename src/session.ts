@@ -125,16 +125,36 @@ function isInside(folder: string, filePath: string): boolean {
   return samePath(folder, filePath) || path.normalize(filePath).startsWith(path.normalize(folder) + path.sep);
 }
 
-/** Create empty mirror files; never touches files that already exist. */
-export async function createMirror(targetRoot: string, rels: string[]): Promise<number> {
+/** Blank lines in the exact count and layout of the source file. */
+function blankSkeleton(sourcePath: string): string {
+  try {
+    return fs.readFileSync(sourcePath, 'utf8').replace(/[^\r\n]/g, '');
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Create mirror files; never touches files that already have content.
+ * New copies (and brand-empty leftovers from older sessions) start as a
+ * blank-line skeleton of the reference, so both diff panes have equal length.
+ */
+export async function createMirror(sourceRoot: string, targetRoot: string, rels: string[]): Promise<number> {
+  const skeleton = vscode.workspace
+    .getConfiguration('vsnovibe')
+    .get<boolean>('skeletonLines', true);
   let created = 0;
   for (const rel of rels) {
     const target = path.join(targetRoot, ...rel.split('/'));
+    const skeletonText = skeleton ? blankSkeleton(path.join(sourceRoot, ...rel.split('/'))) : '';
     if (fs.existsSync(target)) {
+      if (skeleton && fs.statSync(target).size === 0) {
+        await fs.promises.writeFile(target, skeletonText, 'utf8');
+      }
       continue;
     }
     await fs.promises.mkdir(path.dirname(target), { recursive: true });
-    await fs.promises.writeFile(target, '', 'utf8');
+    await fs.promises.writeFile(target, skeletonText, 'utf8');
     created += 1;
   }
   return created;

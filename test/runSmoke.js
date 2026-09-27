@@ -8,7 +8,7 @@ const WS = path.join(__dirname, 'fixtures', 'workspace');
 const SRC = path.join(WS, 'ai-output');
 const MIRROR = path.join(WS, 'ai-output.handwritten');
 
-const REF_A = `// Reference file the agent "generated".
+const REF_A = `// Reference file — the agent “generated” it… with style
 export function add(a: number, b: number): number {
   return a + b;
 }

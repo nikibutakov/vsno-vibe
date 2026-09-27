@@ -180,7 +180,7 @@ export function activate(context: vscode.ExtensionContext): void {
       );
       return;
     }
-    const created = await sessionStore.createMirror(targetRoot, rels);
+    const created = await sessionStore.createMirror(srcRoot, targetRoot, rels);
     session = {
       sourceRoot: srcRoot,
       targetRoot,
@@ -193,7 +193,7 @@ export function activate(context: vscode.ExtensionContext): void {
     updateStatusBar();
     await openFile(0);
     void vscode.window.showInformationMessage(
-      `VS No Vibe: ${rels.length} file${rels.length === 1 ? '' : 's'} in the queue (${created} new empty cop${created === 1 ? 'y' : 'ies'}). Type in the left pane — the AI reference on the right is read-only.`
+      `VS No Vibe: ${rels.length} file${rels.length === 1 ? '' : 's'} in the queue (${created} new skeleton cop${created === 1 ? 'y' : 'ies'}). Type in the left pane — the AI reference on the right is read-only.`
     );
   };
 
