@@ -40,13 +40,14 @@ All commands also appear in the context menu of files and folders in the Explore
 | `vsnovibe.exclude` | `node_modules`, `.git`, `dist`, … | File/folder names to skip while scanning. Dotfiles, binaries, lockfiles and minified files are always skipped. |
 | `vsnovibe.typeableReference` | `true` | Show the reference with untypeable typography replaced: em dashes `—` → `-`, curly quotes → `'`/`"`, non-breaking spaces → spaces. What you see is what you can type, and the diff goes green when you finish a line. |
 | `vsnovibe.skeletonLines` | `true` | Start your copy with as many blank lines as the reference has, instead of an empty file. Both diff panes stay the same length, so there is no striped filler under your text and the cursor never jumps on Enter. |
-| `vsnovibe.pasteBlock.enabled` | `true` | Block pasting into files being rewritten (the inserted text is reverted). |
-| `vsnovibe.pasteBlock.minChars` | `8` | Minimum length of a single insert that counts as a paste. Note: this also blocks long autocomplete/snippet inserts — that is the spirit of the tool. |
+| `vsnovibe.calmDiffColors` | `ask` | Offer calm diff colors on the first session: `ask`, `apply`, or `off`. |
+| `vsnovibe.pasteBlock.enabled` | `true` | Block pasting into files being rewritten: inserts matching the clipboard are reverted. Autocomplete and snippets stay allowed. |
+| `vsnovibe.pasteBlock.minChars` | `8` | Minimum length of a single insert that is checked against the clipboard. |
 
 ## Details worth knowing
 
 - The reference pane is a **virtual read-only document** — you cannot accidentally edit the original.
-- **Too much red/green?** The full-line fill is drawn by your VS Code theme, not by the extension. To keep only a thin strip in the gutter and a faint tint on changed characters, add this to your user `settings.json` (*Preferences: Open User Settings (JSON)*):
+- **Too much red/green?** The extension has you covered: on the first session it offers to apply calm colors (thin gutter strips + a faint tint on changed characters), or run *VS No Vibe: Apply Calm Diff Colors* anytime. Setting `vsnovibe.calmDiffColors` controls this (`ask`/`apply`/`off`); your own `diffEditor.*` customizations are never overwritten. To tune it by hand, add this to your user `settings.json` (*Preferences: Open User Settings (JSON)*):
   ```jsonc
   "workbench.colorCustomizations": {
     // full-line fills off
@@ -93,7 +94,7 @@ Works in VS Code, Cursor, VSCodium and other VS Code-compatible editors.
 3. Печатаешь слева руками. Вставка (Ctrl+V) блокируется. Статус-бар показывает прогресс: `✍ 42% · 3/12` — процент переписанных строк эталона и число готовых файлов.
 4. Файл совпал с эталоном — отмечается ✓ и переносит к следующему (`Ctrl+Alt+N`). Оригиналы ИИ-файлов не изменяются, твои копии — обычные файлы на диске.
 
-Все команды доступны в контекстном меню файлов и папок. Настройки — по префиксу `vsnovibe.`: имя зеркальной папки, исключения при сканировании, блокировка вставки, «печатаемый» эталон (длинные тире `—` заменяются на обычный минус `-`, фигурные кавычки — на прямые: всё, что видишь в эталоне, можно набрать с клавиатуры) и «скелет» — твоя копия создаётся не пустой, а с тем же числом пустых строк, что и эталон: панели diff одной длины, курсор на Enter не убегает вниз.
+Все команды доступны в контекстном меню файлов и папок. Настройки — по префиксу `vsnovibe.`: имя зеркальной папки, исключения при сканировании, «печатаемый» эталон (длинные тире `—` заменяются на обычный минус `-`, фигурные кавычки — на прямые: всё, что видишь в эталоне, можно набрать с клавиатуры), «скелет» — твоя копия создаётся не пустой, а с тем же числом пустых строк, что и эталон: панели diff одной длины, курсор на Enter не убегает вниз, «спокойные цвета» diff (предлагаются при первой сессии или командой Apply Calm Diff Colors) и умная блокировка вставки: настоящий Ctrl+V откатывается, автодополнение через Tab работает.
 
 ## Roadmap
 

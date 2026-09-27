@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 
 /**
- * Reverts any single large edit inside files being rewritten, so the only way
- * to get the code onto the page is to type it. Covers Ctrl+V, context-menu
- * paste, middle-click paste and big autocomplete inserts alike.
+ * Reverts real pastes inside files being rewritten, so the only way to get
+ * the code onto the page is to type it. An insert counts as a paste only when
+ * it matches the clipboard — autocomplete suggestions and snippets (which also
+ * insert more than minChars in one go) are typing aids and stay allowed.
  */
 export function registerPasteGuard(
   context: vscode.ExtensionContext,
@@ -15,19 +16,33 @@ export function registerPasteGuard(
       if (cfg.get('enabled') !== true) {
         return;
       }
-      if (e.contentChanges.length !== 1 || !isGuardedFile(e.document.uri)) {
+      if (!isGuardedFile(e.document.uri)) {
         return;
       }
-      const change = e.contentChanges[0];
       const minChars = cfg.get<number>('minChars') ?? 8;
-      if (change.text.length < minChars) {
+      const suspects = e.contentChanges.filter((c) => c.text.length >= minChars);
+      if (suspects.length === 0) {
         return;
+      }
+      let clipboard: string;
+      try {
+        clipboard = await vscode.env.clipboard.readText();
+      } catch {
+        return;
+      }
+      const pasted = suspects.filter(
+        (c) => c.text.trim().length > 0 && c.text.trim() === clipboard.trim()
+      );
+      if (pasted.length === 0) {
+        return; // autocomplete/snippet insert, not a paste
       }
       const doc = e.document;
-      const from = doc.positionAt(change.rangeOffset);
-      const to = doc.positionAt(change.rangeOffset + change.text.length);
       const revert = new vscode.WorkspaceEdit();
-      revert.delete(doc.uri, new vscode.Range(from, to));
+      for (const change of [...pasted].sort((a, b) => b.rangeOffset - a.rangeOffset)) {
+        const from = doc.positionAt(change.rangeOffset);
+        const to = doc.positionAt(change.rangeOffset + change.text.length);
+        revert.delete(doc.uri, new vscode.Range(from, to));
+      }
       await vscode.workspace.applyEdit(revert);
       void vscode.window.showWarningMessage('No vibe, just hands — paste is blocked while rewriting. Type it out ✍');
     })

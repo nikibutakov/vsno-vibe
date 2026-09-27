@@ -82,12 +82,26 @@ async function run() {
 
   const doc = await vscode.workspace.openTextDocument(path.join(mirror, 'a.ts'));
 
-  // 4. Paste guard: a large insert gets reverted.
+  // 4. Paste guard: an insert matching the clipboard gets reverted.
+  await vscode.env.clipboard.writeText(TYPED_A);
   const paste = new vscode.WorkspaceEdit();
   paste.insert(doc.uri, new vscode.Position(0, 0), TYPED_A);
   await vscode.workspace.applyEdit(paste);
   await sleep(500);
-  assert.strictEqual(lf(doc.getText()), lf(SKELETON_A), 'paste guard did not revert a large insert');
+  assert.strictEqual(lf(doc.getText()), lf(SKELETON_A), 'paste guard did not revert a clipboard-matching insert');
+
+  // 4b. Autocomplete-style insert (clipboard holds something else) is allowed.
+  await vscode.env.clipboard.writeText('nothing to see here');
+  const bDoc = await vscode.workspace.openTextDocument(path.join(mirror, 'nested', 'b.js'));
+  const auto = new vscode.WorkspaceEdit();
+  auto.insert(bDoc.uri, new vscode.Position(0, 0), 'load_dotenv()');
+  await vscode.workspace.applyEdit(auto);
+  await sleep(500);
+  assert.ok(bDoc.getText().includes('load_dotenv()'), 'autocomplete-style insert was wrongly reverted');
+  const undo = new vscode.WorkspaceEdit();
+  undo.delete(bDoc.uri, new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 'load_dotenv()'.length)));
+  await vscode.workspace.applyEdit(undo);
+  await sleep(200);
 
   // 5. Typing plain keyboard text into the skeleton lines reaches a 100%
   //    match: the reference's em dash, curly quotes and ellipsis normalize

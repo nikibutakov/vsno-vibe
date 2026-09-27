@@ -9,6 +9,16 @@ import * as sessionStore from './session';
 const CTX_ACTIVE = 'vsnovibe.sessionActive';
 const REFMAP_KEY = 'vsnovibe.refmap';
 
+/** Calm diff colors: thin gutter strips instead of full-line red/green fills. */
+const CALM_COLORS: Record<string, string> = {
+  'diffEditor.insertedLineBackground': '#00000000',
+  'diffEditor.removedLineBackground': '#00000000',
+  'diffEditor.insertedTextBackground': '#2EA04320',
+  'diffEditor.removedTextBackground': '#F8514920',
+  'diffEditorGutter.insertedLineBackground': '#2EA043',
+  'diffEditorGutter.removedLineBackground': '#F85149',
+};
+
 export function activate(context: vscode.ExtensionContext): void {
   const refProvider = new ReferenceProvider();
   context.subscriptions.push(
@@ -41,6 +51,43 @@ export function activate(context: vscode.ExtensionContext): void {
     return uri.fsPath.startsWith(session.targetRoot + path.sep);
   };
   registerPasteGuard(context, isGuardedFile);
+
+  const calmDecided = { value: context.globalState.get<boolean>('vsnovibe.calmColorsDecided', false) };
+  const markCalmDecided = () => {
+    calmDecided.value = true;
+    void context.globalState.update('vsnovibe.calmColorsDecided', true);
+  };
+  const hasOwnDiffColors = (): boolean => {
+    const current = vscode.workspace
+      .getConfiguration('workbench')
+      .get<Record<string, unknown>>('colorCustomizations', {});
+    return Object.keys(current).some((k) => k.startsWith('diffEditor'));
+  };
+  const applyCalmDiffColors = async (): Promise<void> => {
+    const workbench = vscode.workspace.getConfiguration('workbench');
+    const current = workbench.get<Record<string, unknown>>('colorCustomizations', {});
+    await workbench.update('colorCustomizations', { ...current, ...CALM_COLORS }, vscode.ConfigurationTarget.Global);
+  };
+  const maybeOfferCalmColors = async (): Promise<void> => {
+    const mode = vscode.workspace.getConfiguration('vsnovibe').get<string>('calmDiffColors', 'ask');
+    if (mode === 'off' || calmDecided.value || hasOwnDiffColors()) {
+      return;
+    }
+    if (mode === 'apply') {
+      await applyCalmDiffColors();
+      markCalmDecided();
+      return;
+    }
+    const choice = await vscode.window.showInformationMessage(
+      'VS No Vibe: calm down the diff colors? Thin gutter strips instead of full-line red/green fills — customizable later.',
+      'Apply calm colors',
+      'Keep mine'
+    );
+    markCalmDecided();
+    if (choice === 'Apply calm colors') {
+      await applyCalmDiffColors();
+    }
+  };
 
   const updateStatusBar = (): void => {
     if (!session) {
@@ -142,6 +189,7 @@ export function activate(context: vscode.ExtensionContext): void {
         return;
       }
     }
+    await maybeOfferCalmColors();
     let picked = uri;
     if (!picked) {
       const uris = await vscode.window.showOpenDialog({
@@ -295,6 +343,13 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('vsnovibe.chooseFile', () => chooseFile()),
     vscode.commands.registerCommand('vsnovibe.markDone', () => markDone()),
     vscode.commands.registerCommand('vsnovibe.endSession', () => endSession()),
+    vscode.commands.registerCommand('vsnovibe.applyCalmDiffColors', async () => {
+      await applyCalmDiffColors();
+      markCalmDecided();
+      void vscode.window.showInformationMessage(
+        'Calm diff colors applied to your user settings (workbench.colorCustomizations).'
+      );
+    }),
     vscode.workspace.onDidChangeTextDocument((e) => {
       if (!session || session.current < 0 || e.contentChanges.length === 0) {
         return;
@@ -317,6 +372,7 @@ export function activate(context: vscode.ExtensionContext): void {
   if (session) {
     setActiveCtx();
     updateStatusBar();
+    void maybeOfferCalmColors();
     void vscode.window.showInformationMessage(
       'VS No Vibe session restored. Ctrl+Alt+O to pick a file, Ctrl+Alt+N for the next one.'
     );

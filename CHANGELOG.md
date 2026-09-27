@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0 — 2026-09-28
+
+- **Autocomplete unblocked**: the paste guard now reverts only inserts that match the clipboard. Accepting IntelliSense suggestions and snippets (e.g. `load_dotenv` via Tab) works; Ctrl+V and context-menu paste stay blocked. Drag-and-drop is not blocked (honor system).
+- **Calm diff colors by default**: on the first session the extension offers to replace full-line red/green fills with thin gutter strips + a faint tint on changed characters (`vsnovibe.calmDiffColors`: ask/apply/off, command *VS No Vibe: Apply Calm Diff Colors*). Existing `diffEditor.*` customizations are always respected.
+
 ## 0.2.0 — 2026-09-28
 
 - **Typeable reference**: the read-only pane shows em dashes as `-`, curly quotes as `'`/`"`, non-breaking spaces as regular spaces — everything the AI wrote is now typeable (setting `vsnovibe.typeableReference`). Progress matching uses the same normalization.

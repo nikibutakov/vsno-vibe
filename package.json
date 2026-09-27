@@ -2,7 +2,7 @@
   "name": "vsno-vibe",
   "displayName": "VS No Vibe",
   "description": "No vibe, just hands. Retype AI-generated code by hand, file by file, with a read-only reference open side by side.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "vsno-vibe",
   "license": "MIT",
   "keywords": [
@@ -73,6 +73,11 @@
       {
         "command": "vsnovibe.endSession",
         "title": "End Session",
+        "category": "VS No Vibe"
+      },
+      {
+        "command": "vsnovibe.applyCalmDiffColors",
+        "title": "Apply Calm Diff Colors",
         "category": "VS No Vibe"
       }
     ],
@@ -171,6 +176,17 @@
           "default": true,
           "description": "Prefill your copy with as many blank lines as the reference has, instead of an empty file. Keeps both diff panes the same length: no striped filler under your text and a predictable cursor. Files that already have content are never touched."
         },
+        "vsnovibe.calmDiffColors": {
+          "type": "string",
+          "enum": ["ask", "apply", "off"],
+          "enumDescriptions": [
+            "Ask once on the first session.",
+            "Apply automatically on the first session.",
+            "Never touch the colors."
+          ],
+          "default": "ask",
+          "description": "Offer calm diff editor colors (thin gutter strips instead of full-line red/green fills). Existing diffEditor color customizations are always respected."
+        },
         "vsnovibe.pasteBlock.enabled": {
           "type": "boolean",
           "default": true,
@@ -180,7 +196,7 @@
           "type": "number",
           "default": 8,
           "minimum": 1,
-          "description": "Minimum length of a single inserted edit that triggers the paste block. Also blocks autocomplete inserts longer than this."
+          "description": "Minimum length of a single insert that is checked against the clipboard. Inserts matching the clipboard are reverted as pastes; autocomplete suggestions and snippets stay allowed."
         }
       }
     }
