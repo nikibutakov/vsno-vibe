@@ -110,6 +110,17 @@ async function run() {
   await sleep(1500);
   assert.strictEqual(lf(doc.getText()), TYPED_A, 'typing did not produce the reference content');
 
+  // 5b. Reflexive Enters: blank lines beyond the extra-lines budget are tidied.
+  //     The reference has 9 lines, budget 9 + 5 = 14; seven extra Enters at the
+  //     end must be trimmed back down after the typing pause.
+  for (let i = 0; i < 7; i++) {
+    const nl = new vscode.WorkspaceEdit();
+    nl.insert(doc.uri, doc.positionAt(doc.getText().length), '\n');
+    await vscode.workspace.applyEdit(nl);
+  }
+  await sleep(1000);
+  assert.ok(doc.lineCount <= 14, `blank-line budget exceeded: doc has ${doc.lineCount} lines`);
+
   // 6. a.ts auto-completed at 100%, so "next file" opens nested/b.js.
   await vscode.commands.executeCommand('vsnovibe.nextFile');
   await sleep(500);

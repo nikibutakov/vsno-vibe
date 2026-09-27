@@ -2,7 +2,7 @@
   "name": "vsno-vibe",
   "displayName": "VS No Vibe",
   "description": "No vibe, just hands. Retype AI-generated code by hand, file by file, with a read-only reference open side by side.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "vsno-vibe",
   "license": "MIT",
   "keywords": [
@@ -186,6 +186,12 @@
           ],
           "default": "ask",
           "description": "Offer calm diff editor colors (thin gutter strips instead of full-line red/green fills). Existing diffEditor color customizations are always respected."
+        },
+        "vsnovibe.maxExtraLines": {
+          "type": "number",
+          "default": 5,
+          "minimum": 0,
+          "description": "How many lines longer than the reference your copy may get. Extra blank lines (e.g. reflexive Enters) beyond this budget are removed automatically ~0.4 s after you stop typing — blank lines only, content lines and the line under your cursor are never touched."
         },
         "vsnovibe.pasteBlock.enabled": {
           "type": "boolean",

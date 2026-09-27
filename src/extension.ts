@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { registerPasteGuard } from './pasteGuard';
 import { REF_SCHEME, ReferenceProvider } from './refProvider';
-import { matchPercent } from './progress';
+import { matchPercent, splitLines } from './progress';
 import * as sessionStore from './session';
 
 const CTX_ACTIVE = 'vsnovibe.sessionActive';
@@ -33,6 +33,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   let session: sessionStore.Session | undefined = sessionStore.load(context);
   let currentPercent: number | undefined;
+  let refTotalLines: number | undefined;
   let progressTimer: ReturnType<typeof setTimeout> | undefined;
   let progressRetries = 0;
 
@@ -121,6 +122,51 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   });
 
+  /**
+   * Keeps the copy close to the reference in size: blank lines beyond
+   * maxExtraLines (reflexive Enters) are removed, bottom-up. Content lines
+   * are never touched, and the line under the cursor is left alone so the
+   * cleanup never fights active typing.
+   */
+  const tidyBlankLines = async (doc: vscode.TextDocument): Promise<number> => {
+    if (refTotalLines === undefined) {
+      return 0;
+    }
+    const cap = vscode.workspace.getConfiguration('vsnovibe').get<number>('maxExtraLines', 5);
+    const budget = refTotalLines + cap;
+    let excess = doc.lineCount - budget;
+    if (excess <= 0) {
+      return 0;
+    }
+    const editor = vscode.window.activeTextEditor;
+    const cursorLine =
+      editor && editor.document.uri.fsPath === doc.uri.fsPath ? editor.selection.active.line : -1;
+    const blankIdx: number[] = [];
+    for (let i = doc.lineCount - 1; i >= 0; i--) {
+      if (doc.lineAt(i).isEmptyOrWhitespace) {
+        blankIdx.push(i);
+      }
+    }
+    const edit = new vscode.WorkspaceEdit();
+    let removed = 0;
+    for (const i of blankIdx) {
+      if (excess <= 0) {
+        break;
+      }
+      if (i >= doc.lineCount - 1 || i === cursorLine || i === cursorLine + 1) {
+        continue;
+      }
+      edit.delete(doc.uri, new vscode.Range(doc.lineAt(i).range.start, doc.lineAt(i + 1).range.start));
+      removed += 1;
+      excess -= 1;
+    }
+    if (removed === 0) {
+      return 0;
+    }
+    await vscode.workspace.applyEdit(edit);
+    return removed;
+  };
+
   const recomputeProgress = async (): Promise<void> => {
     if (!session || session.current < 0) {
       return;
@@ -142,8 +188,10 @@ export function activate(context: vscode.ExtensionContext): void {
       updateStatusBar();
       return;
     }
+    refTotalLines = splitLines(reference).length;
     currentPercent = matchPercent(reference, doc.getText());
     updateStatusBar();
+    await tidyBlankLines(doc);
     if (currentPercent === 100 && !entry.done) {
       entry.done = true;
       persist();
@@ -165,6 +213,7 @@ export function activate(context: vscode.ExtensionContext): void {
     session.current = index;
     persist();
     currentPercent = undefined;
+    refTotalLines = undefined;
     updateStatusBar();
     const entry = session.files[index];
     const target = vscode.Uri.file(targetPath(entry.rel));
@@ -301,6 +350,10 @@ export function activate(context: vscode.ExtensionContext): void {
     const entry = s.files[s.current];
     if (entry.done) {
       return;
+    }
+    const doc = vscode.workspace.textDocuments.find((d) => d.uri.fsPath === targetPath(entry.rel));
+    if (doc) {
+      await tidyBlankLines(doc);
     }
     entry.done = true;
     persist();

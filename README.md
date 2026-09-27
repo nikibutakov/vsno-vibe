@@ -41,6 +41,7 @@ All commands also appear in the context menu of files and folders in the Explore
 | `vsnovibe.typeableReference` | `true` | Show the reference with untypeable typography replaced: em dashes `—` → `-`, curly quotes → `'`/`"`, non-breaking spaces → spaces. What you see is what you can type, and the diff goes green when you finish a line. |
 | `vsnovibe.skeletonLines` | `true` | Start your copy with as many blank lines as the reference has, instead of an empty file. Both diff panes stay the same length, so there is no striped filler under your text and the cursor never jumps on Enter. |
 | `vsnovibe.calmDiffColors` | `ask` | Offer calm diff colors on the first session: `ask`, `apply`, or `off`. |
+| `vsnovibe.maxExtraLines` | `5` | How many lines longer than the reference your copy may get. Extra blank lines beyond this budget are removed automatically ~0.4 s after you stop typing (content lines are never touched). |
 | `vsnovibe.pasteBlock.enabled` | `true` | Block pasting into files being rewritten: inserts matching the clipboard are reverted. Autocomplete and snippets stay allowed. |
 | `vsnovibe.pasteBlock.minChars` | `8` | Minimum length of a single insert that is checked against the clipboard. |
 
@@ -94,7 +95,7 @@ Works in VS Code, Cursor, VSCodium and other VS Code-compatible editors.
 3. Печатаешь слева руками. Вставка (Ctrl+V) блокируется. Статус-бар показывает прогресс: `✍ 42% · 3/12` — процент переписанных строк эталона и число готовых файлов.
 4. Файл совпал с эталоном — отмечается ✓ и переносит к следующему (`Ctrl+Alt+N`). Оригиналы ИИ-файлов не изменяются, твои копии — обычные файлы на диске.
 
-Все команды доступны в контекстном меню файлов и папок. Настройки — по префиксу `vsnovibe.`: имя зеркальной папки, исключения при сканировании, «печатаемый» эталон (длинные тире `—` заменяются на обычный минус `-`, фигурные кавычки — на прямые: всё, что видишь в эталоне, можно набрать с клавиатуры), «скелет» — твоя копия создаётся не пустой, а с тем же числом пустых строк, что и эталон: панели diff одной длины, курсор на Enter не убегает вниз, «спокойные цвета» diff (предлагаются при первой сессии или командой Apply Calm Diff Colors) и умная блокировка вставки: настоящий Ctrl+V откатывается, автодополнение через Tab работает.
+Все команды доступны в контекстном меню файлов и папок. Настройки — по префиксу `vsnovibe.`: имя зеркальной папки, исключения при сканировании, «печатаемый» эталон (длинные тире `—` заменяются на обычный минус `-`, фигурные кавычки — на прямые: всё, что видишь в эталоне, можно набрать с клавиатуры), «скелет» — твоя копия создаётся не пустой, а с тем же числом пустых строк, что и эталон: панели diff одной длины, курсор на Enter не убегает вниз, «спокойные цвета» diff (предлагаются при первой сессии или командой Apply Calm Diff Colors) и умная блокировка вставки: настоящий Ctrl+V откатывается, автодополнение через Tab работает, а рефлексные лишние Enter'ы убираются сами: копия может вырасти максимум на `vsnovibe.maxExtraLines` (по умолчанию 5) пустых строк сверх эталона — это всё же реврайт, а не дописывание.
 
 ## Roadmap
 

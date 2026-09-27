@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 — 2026-09-28
+
+- **Blank-line budget**: your copy may grow by at most `vsnovibe.maxExtraLines` (default 5) lines beyond the reference. Reflexive extra Enters are tidied automatically ~0.4 s after you stop typing — blank lines only, removed bottom-up, never the line under your cursor and never lines with content. It is a rewrite, not an append.
+
 ## 0.3.0 — 2026-09-28
 
 - **Autocomplete unblocked**: the paste guard now reverts only inserts that match the clipboard. Accepting IntelliSense suggestions and snippets (e.g. `load_dotenv` via Tab) works; Ctrl+V and context-menu paste stay blocked. Drag-and-drop is not blocked (honor system).
