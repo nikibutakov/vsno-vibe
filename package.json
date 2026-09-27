@@ -28,11 +28,13 @@
     "compile": "npm run check-types && node esbuild.cjs",
     "watch": "node esbuild.cjs --watch",
     "package": "npm run check-types && node esbuild.cjs --production",
+    "smoke": "node test/runSmoke.js",
     "vscode:prepublish": "npm run package"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^3.1.0",
     "esbuild": "^0.25.0",
     "typescript": "^5.7.0"
   },

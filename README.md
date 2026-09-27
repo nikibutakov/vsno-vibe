@@ -63,6 +63,7 @@ code --install-extension vsno-vibe-0.1.0.vsix
 ```
 
 For development: open the folder in VS Code and press `F5` (Extension Development Host).
+End-to-end smoke test: `npm run smoke` — runs the extension in a clean VS Code against a fixture folder (downloads a fresh build into `.vscode-test/` on first run).
 
 Works in VS Code, Cursor, VSCodium and other VS Code-compatible editors.
 
