@@ -1,0 +1,176 @@
+{
+  "name": "vsno-vibe",
+  "displayName": "VS No Vibe",
+  "description": "No vibe, just hands. Retype AI-generated code by hand, file by file, with a read-only reference open side by side.",
+  "version": "0.1.0",
+  "publisher": "vsno-vibe",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "vibe coding",
+    "retype",
+    "learning",
+    "typing",
+    "practice",
+    "copywork"
+  ],
+  "categories": [
+    "Other",
+    "Education"
+  ],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "compile": "npm run check-types && node esbuild.cjs",
+    "watch": "node esbuild.cjs --watch",
+    "package": "npm run check-types && node esbuild.cjs --production",
+    "vscode:prepublish": "npm run package"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "vsnovibe.startFolder",
+        "title": "Start Rewriting Folder…",
+        "category": "VS No Vibe"
+      },
+      {
+        "command": "vsnovibe.startFile",
+        "title": "Start Rewriting File…",
+        "category": "VS No Vibe"
+      },
+      {
+        "command": "vsnovibe.nextFile",
+        "title": "Next File",
+        "category": "VS No Vibe"
+      },
+      {
+        "command": "vsnovibe.prevFile",
+        "title": "Previous File",
+        "category": "VS No Vibe"
+      },
+      {
+        "command": "vsnovibe.chooseFile",
+        "title": "Choose File…",
+        "category": "VS No Vibe"
+      },
+      {
+        "command": "vsnovibe.markDone",
+        "title": "Mark Current File as Done",
+        "category": "VS No Vibe"
+      },
+      {
+        "command": "vsnovibe.endSession",
+        "title": "End Session",
+        "category": "VS No Vibe"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "vsnovibe.nextFile",
+        "key": "ctrl+alt+n",
+        "when": "vsnovibe.sessionActive"
+      },
+      {
+        "command": "vsnovibe.prevFile",
+        "key": "ctrl+alt+p",
+        "when": "vsnovibe.sessionActive"
+      },
+      {
+        "command": "vsnovibe.chooseFile",
+        "key": "ctrl+alt+o",
+        "when": "vsnovibe.sessionActive"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "vsnovibe.startFolder",
+          "when": "explorerResourceIsFolder && !listMultiSelection",
+          "group": "9_vsnovibe"
+        },
+        {
+          "command": "vsnovibe.startFile",
+          "when": "!explorerResourceIsFolder && !listMultiSelection",
+          "group": "9_vsnovibe"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "vsnovibe.startFolder",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "vsnovibe.startFile",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "vsnovibe.nextFile",
+          "when": "vsnovibe.sessionActive"
+        },
+        {
+          "command": "vsnovibe.prevFile",
+          "when": "vsnovibe.sessionActive"
+        },
+        {
+          "command": "vsnovibe.chooseFile",
+          "when": "vsnovibe.sessionActive"
+        },
+        {
+          "command": "vsnovibe.markDone",
+          "when": "vsnovibe.sessionActive"
+        },
+        {
+          "command": "vsnovibe.endSession",
+          "when": "vsnovibe.sessionActive"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "VS No Vibe",
+      "properties": {
+        "vsnovibe.targetFolderSuffix": {
+          "type": "string",
+          "default": ".handwritten",
+          "description": "Suffix for the mirror folder with your handwritten copies. Created next to the source folder (or as 'handwritten' inside it when the source is a workspace root)."
+        },
+        "vsnovibe.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "node_modules",
+            ".git",
+            "dist",
+            "build",
+            "out",
+            ".vscode",
+            "coverage"
+          ],
+          "description": "File or folder names to skip when scanning the source folder (matched case-insensitively against any path segment). Dotfiles, binaries, lockfiles and minified files are always skipped."
+        },
+        "vsnovibe.pasteBlock.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Block pasting into files you are rewriting (the inserted text is reverted)."
+        },
+        "vsnovibe.pasteBlock.minChars": {
+          "type": "number",
+          "default": 8,
+          "minimum": 1,
+          "description": "Minimum length of a single inserted edit that triggers the paste block. Also blocks autocomplete inserts longer than this."
+        }
+      }
+    }
+  }
+}
