@@ -3,7 +3,7 @@
   "displayName": "VS No Vibe",
   "description": "No vibe, just hands. Retype AI-generated code by hand, file by file, with a read-only reference open side by side.",
   "version": "0.4.0",
-  "publisher": "vsno-vibe",
+  "publisher": "nikibutakov",
   "license": "MIT",
   "icon": "icon.png",
   "repository": {
