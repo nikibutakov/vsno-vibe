@@ -1,6 +1,7 @@
 .vscode/**
 src/**
 test/**
+scripts/**
 node_modules/**
 esbuild.cjs
 tsconfig.json

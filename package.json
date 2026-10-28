@@ -5,6 +5,7 @@
   "version": "0.4.0",
   "publisher": "vsno-vibe",
   "license": "MIT",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/nikibutakov/vsno-vibe.git"
